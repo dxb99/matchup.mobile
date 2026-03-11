@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>DXB99 Matchup Mobile</title>
+
+<style>
+
+body{
+margin:0;
+background:#000;
+color:white;
+font-family:Arial, sans-serif;
+}
+
+.app{
+max-width:420px;
+margin:auto;
+padding-bottom:80px;
+}
+
+/* header */
+
+.header{
+text-align:center;
+font-size:22px;
+font-weight:900;
+padding:16px;
+border-bottom:1px solid #222;
+}
+
+/* cards */
+
+.card{
+background:#111;
+padding:16px;
+margin:12px;
+border-radius:12px;
+}
+
+/* matchup banner */
+
+.match-banner{
+background:#111;
+padding:16px;
+margin:12px;
+border-radius:12px;
+text-align:center;
+}
+
+.banner-title{
+font-size:20px;
+font-weight:900;
+margin-bottom:6px;
+}
+
+/* select */
+
+select{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+margin-top:6px;
+}
+
+/* player grid */
+
+.player-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin-top:10px;
+}
+
+.player-grid label{
+background:#1a1a1a;
+padding:10px;
+border-radius:8px;
+display:flex;
+gap:8px;
+align-items:center;
+font-weight:700;
+}
+
+/* buttons */
+
+button{
+width:100%;
+padding:14px;
+border-radius:10px;
+border:none;
+font-weight:900;
+margin-top:10px;
+}
+
+.primary{
+background:#16a34a;
+color:white;
+}
+
+.danger{
+background:#dc2626;
+color:white;
+}
+
+/* diff filter */
+
+.diff-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:6px;
+margin-top:10px;
+}
+
+.diff-grid label{
+background:#1a1a1a;
+padding:10px;
+border-radius:8px;
+text-align:center;
+font-weight:700;
+}
+
+/* team rows */
+
+.team-row{
+background:#111;
+border-radius:12px;
+padding:12px;
+margin:10px;
+}
+
+.team-info{
+font-size:14px;
+line-height:1.5;
+}
+
+/* bottom nav */
+
+.bottom-nav{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:70px;
+background:#0b1225;
+display:flex;
+justify-content:space-around;
+align-items:center;
+border-top:1px solid #222;
+}
+
+.bottom-nav button{
+background:none;
+border:none;
+color:white;
+font-size:13px;
+font-weight:800;
+width:auto;
+margin:0;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+<div class="header">DXB99 MATCHUP</div>
+
+<!-- MATCHUP -->
+
+<section id="matchupPage">
+
+<div id="matchupBanner" class="match-banner">
+
+<div class="banner-title">NO ACTIVE MATCHUP</div>
+
+<div id="matchupContent">
+Tap Generate to create teams
+</div>
+
+<div id="matchExpiry"></div>
+
+</div>
+
+</section>
+
+
+<!-- GENERATOR -->
+
+<section id="generatorPage" style="display:none">
+
+<div id="selectedTeamBanner" class="match-banner" style="display:none">
+
+<div id="generatorBannerTitle" class="banner-title">
+CURRENT MATCHUP
+</div>
+
+<div id="selectedPickedBy"></div>
+
+<div id="selectedTeamLines"></div>
+
+<div id="selectedTimeAgo"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Match Maker</h3>
+<select id="pickerSelect"></select>
+
+<h3>Players (<span id="playerCount">0</span>)</h3>
+
+<div id="attendance" class="player-grid"></div>
+
+<button id="generateBtn" class="primary">GENERATE MATCHUP</button>
+
+<div class="diff-grid">
+
+<label id="labelAll">
+<input type="radio" name="diffFilter" value="all" checked>
+All
+</label>
+
+<label id="label0">
+<input type="radio" name="diffFilter" value="0">
+0
+</label>
+
+<label id="label1">
+<input type="radio" name="diffFilter" value="1">
+1
+</label>
+
+<label id="label2">
+<input type="radio" name="diffFilter" value="2">
+2
+</label>
+
+<label id="label3">
+<input type="radio" name="diffFilter" value="3">
+3
+</label>
+
+<label id="label4">
+<input type="radio" name="diffFilter" value="4">
+4
+</label>
+
+</div>
+
+</div>
+
+<div id="result"></div>
+
+</section>
+
+
+<!-- HISTORY -->
+
+<section id="historyPage" style="display:none">
+
+<div class="card">
+
+<h3>History</h3>
+
+<select id="historyFilter"></select>
+
+<button id="clearHistoryBtn" class="danger">
+Clear History
+</button>
+
+</div>
+
+<div id="historyList"></div>
+
+</section>
+
+
+<!-- INFO -->
+
+<section id="infoPage" style="display:none">
+
+<div class="card">
+
+<h3>Blue Advantage</h3>
+
+<p>
+Blue Advantage happens when teams have uneven players.
+</p>
+
+<p>
+Each player has 5 lives in BLITZ.  
+Fewer players means fewer total lives.
+</p>
+
+<p>
+To balance matches the smaller team becomes Blue.
+</p>
+
+</div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section id="adminPage" style="display:none">
+
+<div class="card">
+
+<h3>Admin Panel</h3>
+
+<div id="adminSection"></div>
+
+</div>
+
+</section>
+
+
+<!-- BOTTOM NAV -->
+
+<nav class="bottom-nav">
+
+<button id="matchTab">Match</button>
+
+<button id="genTab">Generate</button>
+
+<button id="histTab">History</button>
+
+<button id="infoTab">Info</button>
+
+<button id="adminTab">Admin</button>
+
+</nav>
+
+</div>
+
+
+<script>
+
+/* ===== GOOGLE SCRIPT URL ===== */
+
+const GOOGLE_API_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL";
+
+
+/* ===== SAMPLE PLAYER LIST ===== */
+
+let players = [
+{name:"Garry",skill:3},
+{name:"Ibrahim",skill:4},
+{name:"Fawad",skill:4},
+{name:"Hamad",skill:5},
+{name:"Basith",skill:5},
+{name:"Bijo",skill:6},
+{name:"Clayton",skill:6},
+{name:"Arshad",skill:7},
+{name:"Sameer",skill:8},
+{name:"Ron",skill:8}
+];
+
+
+/* ===== ELEMENTS ===== */
+
+const pickerSelect=document.getElementById("pickerSelect");
+const attendanceDiv=document.getElementById("attendance");
+const resultDiv=document.getElementById("result");
+const playerCount=document.getElementById("playerCount");
+
+
+/* ===== RENDER PICKER ===== */
+
+function renderPicker(){
+
+pickerSelect.innerHTML="";
+
+players.forEach(p=>{
+const opt=document.createElement("option");
+opt.value=p.name;
+opt.textContent=p.name;
+pickerSelect.appendChild(opt);
+});
+
+}
+
+
+/* ===== RENDER PLAYERS ===== */
+
+function renderAttendance(){
+
+attendanceDiv.innerHTML="";
+
+players.forEach((p,i)=>{
+
+const label=document.createElement("label");
+
+const cb=document.createElement("input");
+cb.type="checkbox";
+cb.id="p"+i;
+cb.checked=true;
+
+cb.addEventListener("change",updateCount);
+
+label.appendChild(cb);
+
+const text=document.createElement("span");
+text.textContent=p.name+" ("+p.skill+")";
+
+label.appendChild(text);
+
+attendanceDiv.appendChild(label);
+
+});
+
+updateCount();
+
+}
+
+
+/* ===== COUNT PLAYERS ===== */
+
+function updateCount(){
+
+let c=0;
+
+players.forEach((p,i)=>{
+const cb=document.getElementById("p"+i);
+if(cb && cb.checked)c++;
+});
+
+playerCount.textContent=c;
+
+}
+
+
+/* ===== GENERATE MATCHUPS ===== */
+
+document.getElementById("generateBtn").onclick=generateTeams;
+
+function generateTeams(){
+
+const selected=[];
+
+players.forEach((p,i)=>{
+const cb=document.getElementById("p"+i);
+if(cb.checked)selected.push(p);
+});
+
+if(selected.length<2){
+alert("Select at least 2 players");
+return;
+}
+
+resultDiv.innerHTML="";
+
+const div=document.createElement("div");
+div.className="team-row";
+
+div.innerHTML=`
+<div class="team-info">
+Matchup generator running...<br>
+Players selected: ${selected.length}
+</div>
+`;
+
+resultDiv.appendChild(div);
+
+}
+
+
+/* ===== NAVIGATION ===== */
+
+function showPage(id){
+
+["matchupPage","generatorPage","historyPage","infoPage","adminPage"].forEach(p=>{
+document.getElementById(p).style.display="none";
+});
+
+document.getElementById(id).style.display="block";
+
+}
+
+document.getElementById("matchTab").onclick=()=>showPage("matchupPage");
+document.getElementById("genTab").onclick=()=>showPage("generatorPage");
+document.getElementById("histTab").onclick=()=>showPage("historyPage");
+document.getElementById("infoTab").onclick=()=>showPage("infoPage");
+document.getElementById("adminTab").onclick=()=>showPage("adminPage");
+
+
+/* ===== INIT ===== */
+
+renderPicker();
+renderAttendance();
+
+</script>
+
+</body>
+</html>
