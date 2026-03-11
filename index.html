@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>DXB99 Matchup Mobile</title>
+<title>DXB99 Matchup</title>
 
 <style>
 
@@ -22,13 +22,36 @@ margin:auto;
 padding-bottom:80px;
 }
 
+/* loading screen */
+
+#loadingScreen{
+position:fixed;
+inset:0;
+background:#000;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+z-index:9999;
+}
+
+#loadingLogo{
+width:280px;
+max-width:90%;
+}
+
+#loadingText{
+font-size:22px;
+font-weight:900;
+letter-spacing:3px;
+margin-top:20px;
+}
+
 /* header */
 
 .header{
 text-align:center;
-font-size:22px;
-font-weight:900;
-padding:16px;
+padding:14px;
 border-bottom:1px solid #222;
 }
 
@@ -41,7 +64,7 @@ margin:12px;
 border-radius:12px;
 }
 
-/* matchup banner */
+/* banner */
 
 .match-banner{
 background:#111;
@@ -67,7 +90,7 @@ border:none;
 margin-top:6px;
 }
 
-/* player grid */
+/* players */
 
 .player-grid{
 display:grid;
@@ -124,7 +147,7 @@ text-align:center;
 font-weight:700;
 }
 
-/* team rows */
+/* results */
 
 .team-row{
 background:#111;
@@ -167,12 +190,18 @@ margin:0;
 
 </head>
 
-
 <body>
+
+<div id="loadingScreen">
+<img id="loadingLogo" src="DXB99MATCHUP.png">
+<div id="loadingText">LOADING</div>
+</div>
 
 <div class="app">
 
-<div class="header">DXB99 MATCHUP</div>
+<div class="header">
+<img src="DXB99MATCHUP.png" style="width:220px;max-width:90%;">
+</div>
 
 <!-- MATCHUP -->
 
@@ -225,33 +254,27 @@ CURRENT MATCHUP
 <div class="diff-grid">
 
 <label id="labelAll">
-<input type="radio" name="diffFilter" value="all" checked>
-All
+<input type="radio" name="diffFilter" value="all" checked>All
 </label>
 
 <label id="label0">
-<input type="radio" name="diffFilter" value="0">
-0
+<input type="radio" name="diffFilter" value="0">0
 </label>
 
 <label id="label1">
-<input type="radio" name="diffFilter" value="1">
-1
+<input type="radio" name="diffFilter" value="1">1
 </label>
 
 <label id="label2">
-<input type="radio" name="diffFilter" value="2">
-2
+<input type="radio" name="diffFilter" value="2">2
 </label>
 
 <label id="label3">
-<input type="radio" name="diffFilter" value="3">
-3
+<input type="radio" name="diffFilter" value="3">3
 </label>
 
 <label id="label4">
-<input type="radio" name="diffFilter" value="4">
-4
+<input type="radio" name="diffFilter" value="4">4
 </label>
 
 </div>
@@ -273,9 +296,7 @@ All
 
 <select id="historyFilter"></select>
 
-<button id="clearHistoryBtn" class="danger">
-Clear History
-</button>
+<button id="clearHistoryBtn" class="danger">Clear History</button>
 
 </div>
 
@@ -325,18 +346,14 @@ To balance matches the smaller team becomes Blue.
 </section>
 
 
-<!-- BOTTOM NAV -->
+<!-- NAV -->
 
 <nav class="bottom-nav">
 
 <button id="matchTab">Match</button>
-
 <button id="genTab">Generate</button>
-
 <button id="histTab">History</button>
-
 <button id="infoTab">Info</button>
-
 <button id="adminTab">Admin</button>
 
 </nav>
@@ -346,14 +363,27 @@ To balance matches the smaller team becomes Blue.
 
 <script>
 
-/* ===== GOOGLE SCRIPT URL ===== */
+/* loading animation */
 
-const GOOGLE_API_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL";
+let dots=0;
+
+setInterval(()=>{
+
+dots=(dots+1)%4;
+
+document.getElementById("loadingText").textContent=
+"LOADING"+".".repeat(dots);
+
+},400);
+
+setTimeout(()=>{
+document.getElementById("loadingScreen").style.display="none";
+},1200);
 
 
-/* ===== SAMPLE PLAYER LIST ===== */
+/* sample players */
 
-let players = [
+const players=[
 {name:"Garry",skill:3},
 {name:"Ibrahim",skill:4},
 {name:"Fawad",skill:4},
@@ -367,19 +397,13 @@ let players = [
 ];
 
 
-/* ===== ELEMENTS ===== */
-
 const pickerSelect=document.getElementById("pickerSelect");
 const attendanceDiv=document.getElementById("attendance");
 const resultDiv=document.getElementById("result");
 const playerCount=document.getElementById("playerCount");
 
 
-/* ===== RENDER PICKER ===== */
-
 function renderPicker(){
-
-pickerSelect.innerHTML="";
 
 players.forEach(p=>{
 const opt=document.createElement("option");
@@ -390,10 +414,7 @@ pickerSelect.appendChild(opt);
 
 }
 
-
-/* ===== RENDER PLAYERS ===== */
-
-function renderAttendance(){
+function renderPlayers(){
 
 attendanceDiv.innerHTML="";
 
@@ -406,14 +427,14 @@ cb.type="checkbox";
 cb.id="p"+i;
 cb.checked=true;
 
-cb.addEventListener("change",updateCount);
+cb.onchange=updateCount;
 
 label.appendChild(cb);
 
-const text=document.createElement("span");
-text.textContent=p.name+" ("+p.skill+")";
+const span=document.createElement("span");
+span.textContent=p.name+" ("+p.skill+")";
 
-label.appendChild(text);
+label.appendChild(span);
 
 attendanceDiv.appendChild(label);
 
@@ -423,40 +444,19 @@ updateCount();
 
 }
 
-
-/* ===== COUNT PLAYERS ===== */
-
 function updateCount(){
 
 let c=0;
 
 players.forEach((p,i)=>{
-const cb=document.getElementById("p"+i);
-if(cb && cb.checked)c++;
+if(document.getElementById("p"+i).checked)c++;
 });
 
 playerCount.textContent=c;
 
 }
 
-
-/* ===== GENERATE MATCHUPS ===== */
-
-document.getElementById("generateBtn").onclick=generateTeams;
-
-function generateTeams(){
-
-const selected=[];
-
-players.forEach((p,i)=>{
-const cb=document.getElementById("p"+i);
-if(cb.checked)selected.push(p);
-});
-
-if(selected.length<2){
-alert("Select at least 2 players");
-return;
-}
+document.getElementById("generateBtn").onclick=()=>{
 
 resultDiv.innerHTML="";
 
@@ -466,16 +466,16 @@ div.className="team-row";
 div.innerHTML=`
 <div class="team-info">
 Matchup generator running...<br>
-Players selected: ${selected.length}
+Players selected: ${playerCount.textContent}
 </div>
 `;
 
 resultDiv.appendChild(div);
 
-}
+};
 
 
-/* ===== NAVIGATION ===== */
+/* nav */
 
 function showPage(id){
 
@@ -494,10 +494,8 @@ document.getElementById("infoTab").onclick=()=>showPage("infoPage");
 document.getElementById("adminTab").onclick=()=>showPage("adminPage");
 
 
-/* ===== INIT ===== */
-
 renderPicker();
-renderAttendance();
+renderPlayers();
 
 </script>
 
