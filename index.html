@@ -2655,5 +2655,119 @@ setInterval(() => {
 }, 400);
 </script>
 
+
+<style>
+
+/* ===== APP-LIKE UI IMPROVEMENTS ===== */
+
+/* smooth page transitions */
+
+.page{
+  animation:fadePage .25s ease;
+}
+
+@keyframes fadePage{
+  from{
+    opacity:0;
+    transform:translateY(6px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* nicer buttons */
+
+button{
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease,
+    background .15s ease;
+}
+
+button:hover{
+  transform:translateY(-1px);
+}
+
+button.primary{
+  box-shadow:0 6px 16px rgba(0,0,0,0.35);
+}
+
+/* team cards look more premium */
+
+.team-row{
+  backdrop-filter:blur(4px);
+}
+
+/* generator button glow */
+
+.generate-btn{
+  font-size:17px;
+  letter-spacing:.5px;
+  box-shadow:
+    0 0 12px rgba(22,163,74,0.35),
+    0 10px 24px rgba(0,0,0,0.45);
+}
+
+/* player list tap effect */
+
+.player-grid label{
+  transition:
+    transform .12s ease,
+    background .12s ease,
+    box-shadow .12s ease;
+}
+
+.player-grid label:active{
+  transform:scale(.97);
+}
+
+/* nicer bottom nav */
+
+.bottom-tabs{
+  box-shadow:
+    0 -6px 24px rgba(0,0,0,0.65);
+}
+
+/* active tab glow */
+
+.tab-btn.active{
+  box-shadow:
+    0 0 10px rgba(255,255,255,.18),
+    inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+/* matchup banner subtle pulse */
+
+.selected-banner{
+  animation:bannerIdle 6s ease-in-out infinite;
+}
+
+@keyframes bannerIdle{
+  0%{
+    transform:scale(1);
+  }
+  50%{
+    transform:scale(1.01);
+  }
+  100%{
+    transform:scale(1);
+  }
+}
+
+/* history cards */
+
+#historyList .team-row{
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease;
+}
+
+#historyList .team-row:active{
+  transform:scale(.98);
+}
+
+</style>
 </body>
 </html>
